@@ -1,0 +1,14 @@
+#### INSTALL MULTIQC
+conda install -c bioconda multiqc
+
+#### INSTALL TRIM-GALORE
+conda install -c bioconda trim-galore
+
+#### INSTALL MUTSERVE
+git clone https://github.com/seppinho/mutserve.git
+curl -sL mutserve.vercel.app | bash
+
+
+#### INSTALL HAPLOGREP
+curl -sL haplogrep.now.sh | bash
+
