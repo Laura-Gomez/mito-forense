@@ -1,0 +1,13 @@
+data/
+results/
+data-tmp/
+tmp/
+work/
+mutserve/
+ref/NC_012920.1*
+ref/rCRS*
+**/data
+**/results
+**/.nextflow/
+.nextflow.*
+
