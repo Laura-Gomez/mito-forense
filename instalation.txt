@@ -1,8 +1,19 @@
+#### CREATE CONDA ENVIRONMENT
+conda create --name haplogrep2 python=3.6
+
+#### ACTIVATE CONDA ENV
+conda activate haplogrep2
+
 #### INSTALL MULTIQC
-conda install -c bioconda multiqc
+mamba install multiqc
 
 #### INSTALL TRIM-GALORE
-conda install -c bioconda trim-galore
+mamba install trim-galore
+
+
+########### THIS SECTION IS DONE ONLY ONCE GLOBALLY
+###########
+###########
 
 #### INSTALL MUTSERVE
 git clone https://github.com/seppinho/mutserve.git
@@ -11,4 +22,18 @@ curl -sL mutserve.vercel.app | bash
 
 #### INSTALL HAPLOGREP
 curl -sL haplogrep.now.sh | bash
+
+###########
+###########
+###########
+
+########### TO RUN THE PIPELINE
+###########
+###########
+
+#### CHANGE PARAMETERS IN analisis.nf AS NEEDED
+
+#### RUN WORKFLOW
+conda activate haplogrep2
+nextflow run analisis.nf
 
