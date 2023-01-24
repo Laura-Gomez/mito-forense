@@ -2,9 +2,8 @@
 
 nextflow.enable.dsl=2
 
-
-params.reads = "$baseDir/data/*{R1,R2}_001.fastq.gz"
-params.ref = "$baseDir/ref/rCRS.fasta"
+params.reads = "/labs/sbio/gpops/ADNmt/FASTQ/*{R1,R2}_001.fastq.gz"
+params.ref = "/labs/sbio/mito-forense/ref/rCRS.fasta"
 params.resultsDir = "results"
 params.pl = 'Illumina'
 params.pm = 'NextSeq'
@@ -21,7 +20,7 @@ include { fastqc;
 	 multiqc_trim;
 	 align;
 	 mergeSam;
-	 markDuplicatesSpark;
+	 markDuplicates;
 	 getMetrics;
 	 mutServe;
 	 haploGrep } from './modules.nf'
@@ -46,9 +45,9 @@ workflow {
         | groupTuple() \
         | mergeSam
 
-   markDuplicatesSpark(mergeSam.out.merged_sam_ch)
-   getMetrics(markDuplicatesSpark.out.bam_for_variant_calling)
-   mutServe(markDuplicatesSpark.out.bam_for_variant_calling)
+   markDuplicates(mergeSam.out.merged_sam_ch)
+   getMetrics(markDuplicates.out.bam_for_variant_calling)
+   mutServe(markDuplicates.out.bam_for_variant_calling)
    haploGrep(mutServe.out.vc_vcf)
 }
 

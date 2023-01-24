@@ -21,6 +21,7 @@ process fastqc {
 
 
 process trim_Galore {
+  conda '/home/lgomez/miniconda3/envs/haplogrep2'
   cache 'lenient'
   publishDir params.resultsDir, mode: 'symlink'
 
@@ -43,6 +44,7 @@ process trim_Galore {
 
 
 process multiqc_fastqc {
+  conda '/home/lgomez/miniconda3/envs/haplogrep2'
   cache 'lenient'
   publishDir params.resultsDir, mode: 'symlink'
 
@@ -65,6 +67,7 @@ process multiqc_fastqc {
 
 
 process multiqc_trim {
+  conda '/home/lgomez/miniconda3/envs/haplogrep2'
   cache 'lenient'
   publishDir params.resultsDir, mode: 'symlink'
 
@@ -142,7 +145,43 @@ process mergeSam {
    """
 }
 
+process markDuplicates {
+    conda '/home/lgomez/miniconda3/envs/gatk'
+    cache 'lenient'
+    publishDir params.resultsDir, mode:'symlink'
+
+    input:
+    tuple val(sample), path(merged_reads)
+
+    output:
+    tuple val(sample), path("dedup_sorted/${sample}_sorted_dedup.bam"),    emit: bam_for_variant_calling
+    tuple val(sample), path("dedup_sorted/${sample}_dedup_metrics.txt"),   emit: dedup_qc_ch
+    tuple val(sample), path("dedup_sorted/${sample}_sorted_dedup.bai"),   emit: dedup_index_qc_ch
+
+    script:
+    """
+    export JAVA_HOME="~/miniconda3/envs/gatk/bin"
+    export PATH=~/miniconda3/envs/gatk/bin/:$PATH
+
+    mkdir -p ${params.tmpdir}/${workflow.runName}/${sample}
+    mkdir -p dedup_sorted
+
+    java -version
+
+    ${params.gatk} --java-options "-Djava.io.tmpdir=${params.tmpdir}/${workflow.runName}/${sample}" \
+        MarkDuplicates \
+	-I ${sample}_merged.sam \
+        -M dedup_sorted/${sample}_dedup_metrics.txt \
+        -O dedup_sorted/${sample}_sorted_dedup.bam \
+	--CREATE_INDEX true
+
+    rm -r ${params.tmpdir}/${workflow.runName}/${sample}
+    """
+}
+
+
 process markDuplicatesSpark {
+    conda '/home/lgomez/miniconda3/envs/gatk'
     cache 'lenient'
     publishDir params.resultsDir, mode:'symlink'
 
@@ -156,14 +195,20 @@ process markDuplicatesSpark {
 
     script:
     """
+    export JAVA_HOME="~/miniconda3/envs/gatk/bin"
+    export PATH=~/miniconda3/envs/gatk/bin/:$PATH
+
     mkdir -p ${params.tmpdir}/${workflow.runName}/${sample}
     mkdir -p dedup_sorted
+
+    java -version
+
     ${params.gatk} --java-options "-Djava.io.tmpdir=${params.tmpdir}/${workflow.runName}/${sample}" \
-         MarkDuplicatesSpark \
-        -I ${sample}_merged.sam \
+        MarkDuplicatesSpark
+	-I ${sample}_merged.sam \
         -M dedup_sorted/${sample}_dedup_metrics.txt \
         -O dedup_sorted/${sample}_sorted_dedup.bam \
-	--create-output-bam-index 
+	--create-output-bam-index
 
     rm -r ${params.tmpdir}/${workflow.runName}/${sample}
     """

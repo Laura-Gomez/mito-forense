@@ -1,5 +1,21 @@
-#### CREATE CONDA ENVIRONMENT
-conda create --name haplogrep2 python=3.6
+
+####
+#### CREATE CONDA GATK
+####
+
+cd /home/programs/gatk/gatk-4.2.4.1
+
+conda env create -n gatk -f gatkcondaenv.yml
+source activate gatk
+conda install openjdk==8.0.332=h166bdaf_0
+
+
+
+####
+#### CREATE CONDA HAPLOGREP
+####
+
+conda create --name haplogrep2 python=3.7
 
 #### ACTIVATE CONDA ENV
 conda activate haplogrep2
@@ -34,6 +50,5 @@ curl -sL haplogrep.now.sh | bash
 #### CHANGE PARAMETERS IN analisis.nf AS NEEDED
 
 #### RUN WORKFLOW
-conda activate haplogrep2
 nextflow run analisis.nf
 
